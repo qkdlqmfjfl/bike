@@ -29,35 +29,74 @@ class TrafficRiderGame:
         surface.blit(image, image.get_rect(center=center))
 
     def draw_road(self, surface, dt):
-        surface.fill(SKY)
-        pygame.draw.rect(surface, GRASS, (0, HORIZON, WIDTH, HEIGHT - HORIZON))
-        # 멀리 있는 도로가 좁아지는 사다리꼴로 3D 원근감을 만듭니다.
-        pygame.draw.polygon(surface, ROAD, [(WIDTH/2-34, HORIZON), (WIDTH/2+34, HORIZON), (WIDTH/2+430, HEIGHT), (WIDTH/2-430, HEIGHT)])
-        pygame.draw.line(surface, ROAD_EDGE, (WIDTH/2-34, HORIZON), (WIDTH/2-430, HEIGHT), 5)
-        pygame.draw.line(surface, ROAD_EDGE, (WIDTH/2+34, HORIZON), (WIDTH/2+430, HEIGHT), 5)
+        # 노을빛이 도는 네온 야간 도로 배경
+        for i in range(18):
+            t = i / 17
+            color = (
+                int(9 + 39 * t),
+                int(16 + 20 * t),
+                int(35 + 28 * t)
+            )
+            y = int(i * HORIZON / 18)
+            pygame.draw.rect(surface, color, (0, y, WIDTH, HORIZON // 18 + 2))
 
-        # 차선 점선을 지평선에서 아래로 갈수록 길고 굵게 그립니다.
-        self.road_offset = (self.road_offset + self.speed * dt * 0.65) % 1.0
+        # 지평선의 빛나는 노을
+        pygame.draw.circle(surface, (92, 62, 85), (WIDTH // 2, HORIZON - 20), 48)
+        pygame.draw.circle(surface, (225, 135, 105), (WIDTH // 2, HORIZON - 20), 25)
+
+        # 좌우 잔디와 원근감이 있는 도로 갓길
+        surface.fill((20, 65, 52), (0, HORIZON, WIDTH, HEIGHT - HORIZON))
+        pygame.draw.polygon(surface, (105, 105, 95), [
+            (WIDTH/2-40, HORIZON), (WIDTH/2+40, HORIZON),
+            (WIDTH/2+445, HEIGHT), (WIDTH/2-445, HEIGHT)
+        ])
+        pygame.draw.polygon(surface, (43, 47, 58), [
+            (WIDTH/2-34, HORIZON), (WIDTH/2+34, HORIZON),
+            (WIDTH/2+430, HEIGHT), (WIDTH/2-430, HEIGHT)
+        ])
+
+        # 도로 양쪽 경계선
+        pygame.draw.line(surface, (245, 225, 185), (WIDTH/2-34, HORIZON), (WIDTH/2-430, HEIGHT), 4)
+        pygame.draw.line(surface, (245, 225, 185), (WIDTH/2+34, HORIZON), (WIDTH/2+430, HEIGHT), 4)
+
+        # 아스팔트의 은은한 질감
+        for i in range(28):
+            t = ((i / 28) + self.road_offset / 7) % 1.0
+            y = int(HORIZON + t * (HEIGHT - HORIZON))
+            half = 34 + t * 396
+            x = int(WIDTH / 2 + ((i % 3) - 1) * half * 0.42)
+            pygame.draw.circle(surface, (57, 62, 73), (x, y), max(1, int(1 + t * 2)))
+
+        # 차선 점선: 멀리서는 짧고 가까이서는 길고 굵게 표시
+        self.road_offset = (self.road_offset + self.speed * dt * 0.9) % 1.0
         for lane in (-1, 1):
             for i in range(12):
                 t = ((i / 12) + self.road_offset / 12) % 1.0
                 y = int(HORIZON + t * (HEIGHT - HORIZON))
                 half = 34 + t * 396
                 x = int(WIDTH/2 + lane * half / 3)
-                dash_h = max(3, int(5 + t * 28))
+                dash_h = max(3, int(5 + t * 30))
                 dash_w = max(2, int(2 + t * 5))
-                pygame.draw.rect(surface, LANE, (x-dash_w//2, y, dash_w, dash_h))
+                pygame.draw.rect(surface, (235, 220, 165),
+                                 (x-dash_w//2, y, dash_w, dash_h))
 
-        # 지평선의 간단한 산 실루엣과 가로등
-        pygame.draw.polygon(surface, (25, 39, 57), [(0,HORIZON),(90,125),(170,HORIZON),(280,112),(390,HORIZON),(520,135),(650,HORIZON),(790,120),(900,HORIZON),(WIDTH,HORIZON)])
+        # 멀리 보이는 산 실루엣
+        pygame.draw.polygon(surface, (20, 31, 48), [
+            (0,HORIZON),(90,125),(170,HORIZON),(280,112),
+            (390,HORIZON),(520,135),(650,HORIZON),(790,120),
+            (900,HORIZON),(WIDTH,HORIZON)
+        ])
+
+        # 도로 옆 반사 표지판이 뒤로 흘러가며 속도감을 줍니다.
         for side in (-1, 1):
-            for i in range(5):
-                t = ((i / 5) + self.road_offset / 5) % 1
-                y = int(HORIZON + t * 340)
-                x = int(WIDTH/2 + side * (42 + t * 430))
+            for i in range(7):
+                t = ((i / 7) + self.road_offset / 7) % 1.0
+                y = int(HORIZON + t * 350)
+                x = int(WIDTH/2 + side * (42 + t * 445))
                 size = max(2, int(3 + t * 5))
-                pygame.draw.line(surface, (180, 195, 205), (x, y), (x, y-size*5), max(1,size//2))
-                pygame.draw.circle(surface, YELLOW, (x, y-size*5), size)
+                pygame.draw.line(surface, (165, 185, 195),
+                                 (x, y), (x, y-size*5), max(1, size//2))
+                pygame.draw.circle(surface, (255, 205, 110), (x, y-size*5), size)
 
     def draw_hud(self, surface):
         panel = pygame.Surface((WIDTH, 68), pygame.SRCALPHA)
