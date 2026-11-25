@@ -206,12 +206,11 @@ class TrafficRiderGame:
                 self.state = self.GAME_OVER
                 break
             # 아주 가까이 지나간 차량에 근접 회피 보너스
-            if .70 < car.depth < .76 and abs(car_box.centerx-player_box.centerx) < 68:
-                if self.last_near_miss != id(car):
-                    self.score += 250
-                    self.last_near_miss = id(car)
-                    self.near_miss_flash = .7
-                    self.add_particles(self.player.x, self.player.y-20, (80, 220, 255), 7)
+            if .70 < car.depth < .76 and not car.near_miss and abs(car_box.centerx-player_box.centerx) < 68:
+                car.near_miss = True
+                self.score += 250
+                self.near_miss_flash = .7
+                self.add_particles(self.player.x, self.player.y-20, (80, 220, 255), 7)
 
         self.near_miss_flash = max(0.0, self.near_miss_flash-dt)
         self.shake = max(0.0, self.shake-dt)
