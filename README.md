@@ -12,6 +12,10 @@ Traffic Rider에서 영감을 받은 초보자용 **2.5D 오토바이 회피 게
 - 주행 거리, 점수, 속도 표시
 - 시작 화면, 플레이 화면, 게임 오버 화면
 - 게임 오버 후 재시작
+- Shift 키 니트로 부스트와 충전 게이지
+- 근접 회피 보너스와 시각 효과
+- P 키 일시정지 및 재개
+- 난이도에 따라 빨라지는 교통 차량과 도로 속도감
 - 초보자가 읽기 쉽도록 기능별 파일 분리 및 한국어 주석
 
 > 이 게임은 실제 3D 모델을 사용하는 게임이 아니라 Pygame 도형으로 원근감을 표현한 2.5D 게임입니다.
@@ -28,6 +32,15 @@ bike/
 ├── settings.py       # 화면 크기와 색상 설정
 ├── requirements.txt  # 필요한 Python 패키지
 └── README.md         # 프로젝트 설명과 실행 방법
+```
+
+## 자동 검사
+
+GitHub Actions가 코드를 변경할 때마다 Python 문법 검사와 기본 게임 스모크 테스트를 실행합니다.
+
+```bash
+python -m compileall -q .
+SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy python -m unittest discover -s tests -v
 ```
 
 ## GitHub Codespaces에서 실행하기
