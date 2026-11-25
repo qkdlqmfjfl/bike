@@ -84,6 +84,7 @@ class TrafficCar:
         self.depth = depth
         self.color = random.choice(self.COLORS)
         self.variant = random.choice(("sedan", "sport", "van"))
+        self.near_miss = False
 
     def update(self, speed, dt):
         # 화면 아래쪽으로 다가오는 속도. 고속 주행일수록 빠르게 접근합니다.
